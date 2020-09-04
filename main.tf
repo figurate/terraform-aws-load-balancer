@@ -18,20 +18,32 @@ data "aws_subnet_ids" "subnets" {
 }
 
 data "aws_route53_zone" "private_zone" {
-  name         = var.private_zone
+  count        = var.private_zone != null ? 1 : 0
+  name         = "${var.private_zone}."
   private_zone = true
 }
 
 resource "aws_lb" "load_balancer" {
+  name            = "${var.name}-lb"
   internal        = true
   subnets         = data.aws_subnet_ids.subnets.ids
   security_groups = []
+
+  dynamic "access_logs" {
+    for_each = var.logging_bucket != null ? [1] : []
+    content {
+      bucket  = var.logging_bucket
+      prefix  = var.logging_prefix != null ? var.logging_prefix : var.name
+      enabled = true
+    }
+  }
 }
 
 resource "aws_lb_target_group" "load_balancer" {
-  port     = var.target_port
-  protocol = var.target_protocol
-  vpc_id   = data.aws_vpc.vpc.id
+  name_prefix = "${substr(var.name, 0, 5)}-"
+  port        = var.target_port
+  protocol    = var.target_protocol
+  vpc_id      = data.aws_vpc.vpc.id
 }
 
 resource "aws_lb_listener" "load_balancer" {
@@ -46,9 +58,10 @@ resource "aws_lb_listener" "load_balancer" {
 }
 
 resource "aws_route53_record" "load_balancer" {
+  count   = var.private_zone != null ? 1 : 0
   name    = var.name
   type    = "A"
-  zone_id = data.aws_route53_zone.private_zone.zone_id
+  zone_id = data.aws_route53_zone.private_zone[0].zone_id
   alias {
     evaluate_target_health = false
     name                   = aws_lb.load_balancer.dns_name

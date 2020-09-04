@@ -17,6 +17,8 @@ No requirements.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | certificate\_arn | ARN of certificate to use for TLS traffic | `any` | `null` | no |
+| logging\_bucket | An S3 bucket used to store access logs | `any` | `null` | no |
+| logging\_prefix | A prefix applied to access logs | `any` | `null` | no |
 | name | Name to associate with load balancer | `any` | n/a | yes |
 | port | Load balancer ingress port | `number` | n/a | yes |
 | private\_zone | Name of private zone to create DNS alias | `any` | n/a | yes |

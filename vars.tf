@@ -35,4 +35,15 @@ variable "target_protocol" {
 
 variable "private_zone" {
   description = "Name of private zone to create DNS alias"
+  default = null
+}
+
+variable "logging_bucket" {
+  description = "An S3 bucket used to store access logs"
+  default     = null
+}
+
+variable "logging_prefix" {
+  description = "A prefix applied to access logs"
+  default     = null
 }
