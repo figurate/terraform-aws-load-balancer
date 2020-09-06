@@ -10,6 +10,11 @@ variable "subnets" {
   description = "Subnets to deploy into"
 }
 
+variable "security_groups" {
+  description = "A list of security group ids to associate with the load balancer"
+  default     = []
+}
+
 variable "port" {
   description = "Load balancer ingress port"
   type        = number
@@ -17,6 +22,7 @@ variable "port" {
 
 variable "protocol" {
   description = "Load balance ingress protocol"
+  default     = "HTTPS"
 }
 
 variable "certificate_arn" {
@@ -35,7 +41,7 @@ variable "target_protocol" {
 
 variable "private_zone" {
   description = "Name of private zone to create DNS alias"
-  default = null
+  default     = null
 }
 
 variable "logging_bucket" {

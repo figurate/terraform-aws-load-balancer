@@ -27,7 +27,7 @@ resource "aws_lb" "load_balancer" {
   name            = "${var.name}-lb"
   internal        = true
   subnets         = data.aws_subnet_ids.subnets.ids
-  security_groups = []
+  security_groups = var.security_groups
 
   dynamic "access_logs" {
     for_each = var.logging_bucket != null ? [1] : []

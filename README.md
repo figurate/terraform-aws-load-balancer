@@ -21,8 +21,9 @@ No requirements.
 | logging\_prefix | A prefix applied to access logs | `any` | `null` | no |
 | name | Name to associate with load balancer | `any` | n/a | yes |
 | port | Load balancer ingress port | `number` | n/a | yes |
-| private\_zone | Name of private zone to create DNS alias | `any` | n/a | yes |
-| protocol | Load balance ingress protocol | `any` | n/a | yes |
+| private\_zone | Name of private zone to create DNS alias | `any` | `null` | no |
+| protocol | Load balance ingress protocol | `string` | `"HTTPS"` | no |
+| security\_groups | A list of security group ids to associate with the load balancer | `list` | `[]` | no |
 | subnets | Subnets to deploy into | `any` | n/a | yes |
 | target\_port | Target group ingress port | `number` | n/a | yes |
 | target\_protocol | Target group ingress protocol | `any` | n/a | yes |
