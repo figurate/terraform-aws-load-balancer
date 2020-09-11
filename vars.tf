@@ -1,5 +1,5 @@
-variable "name" {
-  description = "Name to associate with load balancer"
+variable "name_prefix" {
+  description = "Prefix to the load balancer name"
 }
 
 variable "vpc" {
@@ -15,28 +15,26 @@ variable "security_groups" {
   default     = []
 }
 
-variable "port" {
-  description = "Load balancer ingress port"
-  type        = number
+variable "target_groups" {
+  description = "A map of target group configurations"
+  type        = map(any)
+  default = {
+    default-https = "HTTPS:443"
+  }
 }
 
-variable "protocol" {
-  description = "Load balance ingress protocol"
-  default     = "HTTPS"
+variable "listeners" {
+  description = "A map of listener configurations"
+  type        = map(any)
+  default = {
+    https-443-forward = "default-https"
+    http-80-redirect  = "HTTPS:443"
+  }
 }
 
 variable "certificate_arn" {
   description = "ARN of certificate to use for TLS traffic"
   default     = null
-}
-
-variable "target_port" {
-  description = "Target group ingress port"
-  type        = number
-}
-
-variable "target_protocol" {
-  description = "Target group ingress protocol"
 }
 
 variable "private_zone" {

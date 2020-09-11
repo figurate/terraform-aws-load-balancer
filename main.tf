@@ -24,7 +24,7 @@ data "aws_route53_zone" "private_zone" {
 }
 
 resource "aws_lb" "load_balancer" {
-  name            = "${var.name}-lb"
+  name_prefix     = var.name_prefix
   internal        = true
   subnets         = data.aws_subnet_ids.subnets.ids
   security_groups = var.security_groups
@@ -33,33 +33,56 @@ resource "aws_lb" "load_balancer" {
     for_each = var.logging_bucket != null ? [1] : []
     content {
       bucket  = var.logging_bucket
-      prefix  = var.logging_prefix != null ? var.logging_prefix : var.name
+      prefix  = var.logging_prefix != null ? var.logging_prefix : var.name_prefix
       enabled = true
     }
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
 resource "aws_lb_target_group" "load_balancer" {
-  name_prefix = "${substr(var.name, 0, 5)}-"
-  port        = var.target_port
-  protocol    = var.target_protocol
+  for_each    = var.target_groups
+  name_prefix = each.key
+  protocol    = split(":", each.value)[0]
+  port        = split(":", each.value)[1]
   vpc_id      = data.aws_vpc.vpc.id
 }
 
 resource "aws_lb_listener" "load_balancer" {
+  for_each          = var.listeners
   load_balancer_arn = aws_lb.load_balancer.arn
-  port              = var.port
-  protocol          = var.protocol
-  certificate_arn   = var.certificate_arn
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.load_balancer.arn
+  port              = local.rules[each.key][0]
+  #checkov:skip=CKV_AWS_2:Dynamic listener config
+  protocol        = local.rules[each.key][1]
+  certificate_arn = var.certificate_arn
+
+  dynamic "default_action" {
+    for_each = local.rules[each.key][2] == "forward" ? [1] : []
+    content {
+      type             = local.rules[each.key][2]
+      target_group_arn = aws_lb_target_group.load_balancer[each.value].arn
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = local.rules[each.key][2] == "redirect" ? [1] : []
+    content {
+      type = local.rules[each.key][2]
+      redirect {
+        status_code = "HTTP_301"
+        protocol    = split(each.value)[0]
+        port        = split(each.value)[1]
+      }
+    }
   }
 }
 
 resource "aws_route53_record" "load_balancer" {
   count   = var.private_zone != null ? 1 : 0
-  name    = var.name
+  name    = var.name_prefix
   type    = "A"
   zone_id = data.aws_route53_zone.private_zone[0].zone_id
   alias {
