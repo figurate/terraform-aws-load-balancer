@@ -17,7 +17,6 @@ variable "security_groups" {
 
 variable "certificate_arn" {
   description = "ARN of certificate to use for TLS traffic"
-  default     = null
 }
 
 variable "private_zone" {

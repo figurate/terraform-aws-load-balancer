@@ -10,7 +10,7 @@ No provider.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| certificate\_arn | ARN of certificate to use for TLS traffic | `any` | `null` | no |
+| certificate\_arn | ARN of certificate to use for TLS traffic | `any` | n/a | yes |
 | logging\_bucket | An S3 bucket used to store access logs | `any` | `null` | no |
 | logging\_prefix | A prefix applied to access logs | `any` | `null` | no |
 | name\_prefix | Name to associate with load balancer | `any` | n/a | yes |
