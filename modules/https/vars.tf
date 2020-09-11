@@ -1,5 +1,5 @@
 variable "name_prefix" {
-  description = "Prefix to the load balancer name"
+  description = "Name to associate with load balancer"
 }
 
 variable "vpc" {
@@ -13,18 +13,6 @@ variable "subnets" {
 variable "security_groups" {
   description = "A list of security group ids to associate with the load balancer"
   default     = []
-}
-
-variable "target_groups" {
-  description = "A map of target group configurations"
-  type        = map(any)
-  default     = {}
-}
-
-variable "listeners" {
-  description = "A map of listener configurations"
-  type        = map(any)
-  default     = {}
 }
 
 variable "certificate_arn" {
