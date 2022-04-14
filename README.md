@@ -1,5 +1,7 @@
 # ![AWS](aws-logo.png) Load Balancer
 
+[![CI](https://github.com/figurate/terraform-aws-load-balancer/actions/workflows/main.yml/badge.svg)](https://github.com/figurate/terraform-aws-load-balancer/actions/workflows/main.yml)
+
 Purpose: Blueprints for AWS Load Balancers.
 
 ## Requirements

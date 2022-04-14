@@ -1,6 +1,9 @@
 /**
  * # ![AWS](aws-logo.png) Load Balancer
  *
+ * [![CI](https://github.com/figurate/terraform-aws-load-balancer/actions/workflows/main.yml/badge.svg)](https://github.com/figurate/terraform-aws-load-balancer/actions/workflows/main.yml)
+ *
+ *
  * Purpose: Blueprints for AWS Load Balancers.
  */
 data "aws_vpc" "vpc" {
@@ -10,8 +13,11 @@ data "aws_vpc" "vpc" {
   }
 }
 
-data "aws_subnet_ids" "subnets" {
-  vpc_id = data.aws_vpc.vpc.id
+data "aws_subnets" "subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.vpc.id]
+  }
   tags = {
     Name = var.subnets
   }
@@ -26,7 +32,7 @@ data "aws_route53_zone" "private_zone" {
 resource "aws_lb" "load_balancer" {
   name_prefix     = var.name_prefix
   internal        = true
-  subnets         = data.aws_subnet_ids.subnets.ids
+  subnets         = data.aws_subnets.subnets.ids
   security_groups = var.security_groups
 
   dynamic "access_logs" {
@@ -62,7 +68,7 @@ resource "aws_lb_listener" "load_balancer" {
   dynamic "default_action" {
     for_each = local.rules[each.key][2] == "forward" ? [1] : []
     content {
-      type             = local.rules[each.key][2]
+      type             = "forward"
       target_group_arn = aws_lb_target_group.load_balancer[each.value].arn
     }
   }
@@ -70,7 +76,7 @@ resource "aws_lb_listener" "load_balancer" {
   dynamic "default_action" {
     for_each = local.rules[each.key][2] == "redirect" ? [1] : []
     content {
-      type = local.rules[each.key][2]
+      type = "redirect"
       redirect {
         status_code = "HTTP_301"
         protocol    = split(each.value)[0]
